@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Registration Form</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="icon" href="xyz.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .data-container {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #277f86;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .form-container {
+            background-color: #277f86;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin-bottom: 20px;
+        }
+        form h2 {
+            margin-bottom: 20px;
+            color: white;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: white;
+        }
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <form id="registrationForm" onsubmit="submitForm(event)">
+            <h2>User Registration Form</h2>
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" pattern="[A-Za-z\s]+" required>
+
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" pattern="[A-Za-z\s]+" required>
+
+            <label for="mobileNumber">Mobile Number:</label>
+            <input type="text" id="mobileNumber" name="mobileNumber" pattern="\d{10}" title="Please enter a valid 10-digit mobile number" required autocomplete="nope">
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="street">Street:</label>
+            <input type="text" id="street" name="street" pattern="[A-Za-z\s]+" required>
+
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" pattern="[A-Za-z\s]+" required>
+
+            <label for="state">State:</label>
+            <input type="text" id="state" name="state" pattern="[A-Za-z\s]+" required>
+
+            <label for="country">Country:</label>
+            <input type="text" id="country" name="country" pattern="[A-Za-z\s]+" required>
+
+            <label for="loginId">Login ID:</label>
+            <input type="text" id="loginId" name="loginId" pattern="(?=.*[a-zA-Z]).{8,}" title="Login ID must be at least 8 characters long and contain at least one letter" required>
+
+            <label for="Password">Password:</label>
+            <input type="text" id="Password" name="Password" required>
+            <p id="message" class="error"></p>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div id="jsonData"></div>
+    <div class="data-container">
+        <table id="dataTable">
+            <!-- <thead>
+                <tr>
+                    <th>Login ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Mobile Number</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Password</th>
+                </tr>
+            </thead> -->
+            <tbody>
+                <!-- Data rows will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+    
+    <script>
+        function validatePassword(password) {
+            const minLength = 8;
+            const maxLength = 20;
+            const hasUpperCase = /[A-Z]/;
+            const hasLowerCase = /[a-z]/;
+            const hasNumber = /\d/;
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/;
+
+            if (password.length < minLength || password.length > maxLength) {
+                return `Password must be between ${minLength} and ${maxLength} characters long.`;
+            }
+
+            if (!hasUpperCase.test(password)) {
+                return 'Password must contain at least one uppercase letter.';
+            }
+
+            if (!hasLowerCase.test(password)) {
+                return 'Password must contain at least one lowercase letter.';
+            }
+
+            if (!hasNumber.test(password)) {
+                return 'Password must contain at least one number.';
+            }
+
+            if (!hasSpecialChar.test(password)) {
+                return 'Password must contain at least one special character.';
+            }
+
+            return 'valid';
+        }
+
+        async function submitForm(event) {
+            event.preventDefault();
+
+            const formData = new FormData(document.getElementById('registrationForm'));
+            const validationMessage = validatePassword(formData.get('Password'));
+
+            const messageElement = document.getElementById('message');
+
+            if (validationMessage !== 'valid') {
+                messageElement.textContent = validationMessage;
+                messageElement.className = 'error';
+                return;
+            }
+
+            const data = {
+                fname: formData.get('firstName'),
+                lname: formData.get('lastName'),
+                mobile: formData.get('mobileNumber'),
+                email: formData.get('email'),
+                address: {
+                    street: formData.get('street'),
+                    city: formData.get('city'),
+                    state: formData.get('state'),
+                    country: formData.get('country'),
+                },
+                id: formData.get('loginId'),
+                password: formData.get('Password'),
+            };
+
+            try {
+                const response = await fetch('/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    alert("Data Submitted");
+                    const result = await response.json();
+                    document.getElementById('jsonData').innerHTML = JSON.stringify(result);
+                    console.log('Success:', result);
+                    fetchData();
+                } else {
+                    console.error('Error:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function fetchData() {
+            try {
+                const response = await fetch('/getall');
+                if (response.ok) {
+                    const data = await response.json();
+                    populateTable(data);
+                } else {
+                    console.error('Failed to fetch data:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function populateTable(data) {
+            const tableBody = document.querySelector('#dataTable tbody');
+            tableBody.innerHTML = '';
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.fname}</td>
+                    <td>${item.lname}</td>
+                    <td>${item.mobile}</td>
+                    <td>${item.email}</td>
+                    <td>${item.address.street}, ${item.address.city}, ${item.address.state}, ${item.address.country}</td>
+                    <td>${item.password}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
